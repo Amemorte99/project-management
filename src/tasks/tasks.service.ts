@@ -63,10 +63,10 @@ export class TasksService {
   }
 
   // Create a task linked to a project and tenant
-async create(data: Partial<Task>, tenantId?: number) {
-  if (!tenantId) throw new Error('Tenant ID is required to create a task');
-  const task = this.repo.create({ ...data });
-  task.project = { id: data.project?.id, tenant: { id: tenantId } } as any;
+async create(data: Partial<Task>, tenantId: number): Promise<Task> {
+  if (!data.project) throw new Error('Project is required');
+  const task = this.repo.create(data);
+  task.project = { id: data.project.id, tenant: { id: tenantId } } as any;
   return this.repo.save(task);
 }
 

@@ -22,12 +22,17 @@ export class TasksController {
     return this.service.findOne(id);
   }
 
-  // Create a new task
-  @Post()
-  @ApiOperation({ summary: 'Create a new task' })
-  create(@Body() data: Partial<Task>) {
-    return this.service.create(data, data.project?.tenant?.id);
-  }
+    // Create a new task
+    @Post()
+    @ApiOperation({ summary: 'Create a new task' })
+    create(@Body() data: Partial<Task>) {
+    // Ensure that project and tenant exist before calling the service
+    if (!data.project || !data.project.tenant || !data.project.tenant.id) {
+        throw new Error('Project and Tenant ID are required');
+    }
+
+    return this.service.create(data, data.project.tenant.id);
+    }
 
   // Update an existing task
   @Put(':id')

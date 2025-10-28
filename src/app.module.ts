@@ -9,6 +9,7 @@ import { Project } from './projects/project.entity';
 import { Task } from './tasks/task.entity';
 import { User } from './users/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Tenant } from './tenant/tenant.entity';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     username: config.get<string>('DB_USER'),
     password: config.get<string>('DB_PASSWORD'),
     database: config.get<string>('DB_NAME'),
-    entities: [User, Project, Task, Comment],
+    entities: [User, Project, Task, Comment,Tenant],
     synchronize: true,
   }),
 }),
