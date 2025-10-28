@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/createUser.dto';
+import { Tenant } from '../tenant/tenant.entity';
 
 @Injectable()
 export class UsersService {
@@ -26,21 +28,22 @@ async findByUsername(username: string): Promise<User | undefined> {
 }
 
 
-    async create(userData: Partial<User>): Promise<User> {
-    if (!userData.username || !userData.password) {
-        throw new BadRequestException('Username and password are required');
-    }
-    userData.password = await bcrypt.hash(userData.password, 10);
-    const user = this.repo.create(userData);
-    return this.repo.save(user);
-    }
+async create(data: CreateUserDto): Promise<User> {
+  // Find tenant
+  const tenant = await this.repo.manager.findOne(Tenant, { where: { id: data.tenantId } });
+  if (!tenant) throw new NotFoundException(`Tenant ${data.tenantId} not found`);
+
+  // Optional: hash password
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  const user = this.repo.create({
+    username: data.username,
+    password: hashedPassword,
+    tenant,
+  });
+
+  return this.repo.save(user);
+}
 
 
-  async validateUser(username: string, password: string): Promise<User | null> {
-    const user = await this.findByUsername(username);
-    if (user && await bcrypt.compare(password, user.password)) {
-      return user;
-    }
-    return null;
-  }
 }

@@ -11,6 +11,9 @@ export class Tenant {
   @Column({ unique: true })
   name: string;
 
+    @Column({ type: 'text', nullable: true }) 
+  description?: string;
+
   // One tenant can have many users
   @OneToMany(() => User, user => user.tenant)
   users: User[];

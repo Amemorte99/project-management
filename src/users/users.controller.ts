@@ -1,3 +1,4 @@
+// users.controller.ts
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -21,12 +22,9 @@ export class UsersController {
     return this.service.findOne(id);
   }
 
-
-
-    @Post()
-    @ApiOperation({ summary: 'Create a user' })
-    create(@Body() data: CreateUserDto): Promise<User> {
+  @Post()
+  @ApiOperation({ summary: 'Create a user' })
+  create(@Body() data: CreateUserDto): Promise<User> {
     return this.service.create(data);
-    }
-
+  }
 }

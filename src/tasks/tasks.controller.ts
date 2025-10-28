@@ -1,50 +1,41 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task } from './task.entity';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @ApiTags('tasks')
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly service: TasksService) {}
 
-  // Get all tasks
   @Get()
-  @ApiOperation({ summary: 'Retrieve all tasks' })
+  @ApiOperation({ summary: 'Get all tasks' })
   findAll() {
     return this.service.findAll();
   }
 
-  // Get a task by its ID
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a task by ID' })
-  findOne(@Param('id') id: number) {
+  @ApiOperation({ summary: 'Get a task by ID' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 
-    // Create a new task
-    @Post()
-    @ApiOperation({ summary: 'Create a new task' })
-    create(@Body() data: Partial<Task>) {
-    // Ensure that project and tenant exist before calling the service
-    if (!data.project || !data.project.tenant || !data.project.tenant.id) {
-        throw new Error('Project and Tenant ID are required');
-    }
+  @Post()
+  @ApiOperation({ summary: 'Create a task' })
+  create(@Body() data: CreateTaskDto) {
+    return this.service.create(data);
+  }
 
-    return this.service.create(data, data.project.tenant.id);
-    }
-
-  // Update an existing task
   @Put(':id')
   @ApiOperation({ summary: 'Update a task' })
-  update(@Param('id') id: number, @Body() data: Partial<Task>) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateTaskDto) {
     return this.service.update(id, data);
   }
 
-  // Delete a task
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a task' })
-  remove(@Param('id') id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.delete(id);
   }
 }

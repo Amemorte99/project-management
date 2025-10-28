@@ -13,6 +13,7 @@ import { Project } from './projects/project.entity';
 import { Task } from './tasks/task.entity';
 import { Comment } from './comments/comment.entity';
 import { Tenant } from './tenant/tenant.entity';
+import { TenantsModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { Tenant } from './tenant/tenant.entity';
     UsersModule,
     ProjectsModule,
     TasksModule,
+    TenantsModule,
     CommentsModule,
   ],
 })

@@ -2,73 +2,73 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './task.entity';
+import { User } from '../users/user.entity';
+import { Project } from '../projects/project.entity';
+import { Tenant } from '../tenant/tenant.entity';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
-  constructor(
-    @InjectRepository(Task)
-    private readonly repo: Repository<Task>,
-  ) {}
+  constructor(@InjectRepository(Task) private readonly repo: Repository<Task>) {}
 
-  // Retrieve all tasks with relations
-  async findAll(): Promise<Task[]> {
-    return this.repo.find({ relations: ['project', 'assignedTo', 'createdBy', 'comments'] });
+  findAll(): Promise<Task[]> {
+    return this.repo.find({ relations: ['assignedTo', 'createdBy', 'project', 'tenant'] });
   }
 
-  // Retrieve a single task by ID with relations
   async findOne(id: number): Promise<Task> {
-    const task = await this.repo.findOne({ 
-      where: { id }, 
-      relations: ['project', 'assignedTo', 'createdBy', 'comments'] 
+    const task = await this.repo.findOne({
+      where: { id },
+      relations: ['assignedTo', 'createdBy', 'project', 'tenant', 'comments'],
     });
     if (!task) throw new NotFoundException(`Task ${id} not found`);
     return task;
   }
 
-  // Update a task by ID
-  async update(id: number, data: Partial<Task>): Promise<Task> {
-    const task = await this.repo.preload({ id, ...data });
-    if (!task) throw new NotFoundException(`Task ${id} not found`);
+  async create(data: CreateTaskDto): Promise<Task> {
+    const assignedTo = await this.repo.manager.findOne(User, { where: { id: data.assignedToId } });
+    if (!assignedTo) throw new NotFoundException(`User ${data.assignedToId} not found`);
+
+    const createdBy = await this.repo.manager.findOne(User, { where: { id: data.createdById } });
+    if (!createdBy) throw new NotFoundException(`User ${data.createdById} not found`);
+
+    const project = await this.repo.manager.findOne(Project, { where: { id: data.projectId } });
+    if (!project) throw new NotFoundException(`Project ${data.projectId} not found`);
+
+    const tenant = await this.repo.manager.findOne(Tenant, { where: { id: data.tenantId } });
+    if (!tenant) throw new NotFoundException(`Tenant ${data.tenantId} not found`);
+
+    const task = this.repo.create({
+      title: data.title,
+      description: data.description,
+      status: data.status ?? 'TODO',
+      assignedTo,
+      createdBy,
+      project,
+      tenant,
+    });
+
     return this.repo.save(task);
   }
 
-  // Delete a task by ID
+  async update(id: number, data: UpdateTaskDto): Promise<Task> {
+    const task = await this.findOne(id);
+
+    if (data.assignedToId) {
+      const assignedTo = await this.repo.manager.findOne(User, { where: { id: data.assignedToId } });
+      if (!assignedTo) throw new NotFoundException(`User ${data.assignedToId} not found`);
+      task.assignedTo = assignedTo;
+    }
+
+    if (data.title !== undefined) task.title = data.title;
+    if (data.description !== undefined) task.description = data.description;
+    if (data.status !== undefined) task.status = data.status;
+
+    return this.repo.save(task);
+  }
+
   async delete(id: number): Promise<void> {
     const result = await this.repo.delete(id);
     if (result.affected === 0) throw new NotFoundException(`Task ${id} not found`);
   }
-
-  // Find tasks by project ID
-  async findByProject(projectId: number): Promise<Task[]> {
-    return this.repo.find({
-      where: { project: { id: projectId } },
-      relations: ['project', 'assignedTo', 'createdBy', 'comments'],
-    });
-  }
-
-  // Find tasks by user (assigned or created)
-  async findByUser(userId: number): Promise<Task[]> {
-    return this.repo.find({
-      where: [{ assignedTo: { id: userId } }, { createdBy: { id: userId } }],
-      relations: ['project', 'assignedTo', 'createdBy', 'comments'],
-    });
-  }
-
-  // Find tasks by project and tenant (multi-tenant filtering)
-  async findAllByProject(projectId: number, tenantId: number): Promise<Task[]> {
-    return this.repo.find({ 
-      where: { project: { id: projectId, tenant: { id: tenantId } } },
-      relations: ['assignedTo', 'createdBy', 'comments']
-    });
-  }
-
-  // Create a task linked to a project and tenant
-async create(data: Partial<Task>, tenantId: number): Promise<Task> {
-  if (!data.project) throw new Error('Project is required');
-  const task = this.repo.create(data);
-  task.project = { id: data.project.id, tenant: { id: tenantId } } as any;
-  return this.repo.save(task);
-}
-
-
 }
