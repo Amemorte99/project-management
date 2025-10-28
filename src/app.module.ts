@@ -1,21 +1,33 @@
 import { Module } from '@nestjs/common';
+
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CommentsModule } from './comments/comments.module';
+import { Project } from './projects/project.entity';
+import { Task } from './tasks/task.entity';
+import { User } from './users/user.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+   ConfigModule.forRoot({ isGlobal: true }),
+   TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (config: ConfigService) => ({
+    type: 'mysql',
+    host: config.get<string>('DB_HOST'),
+    port: parseInt(config.get<string>('DB_PORT') || '3306', 10),
+    username: config.get<string>('DB_USER'),
+    password: config.get<string>('DB_PASSWORD'),
+    database: config.get<string>('DB_NAME'),
+    entities: [User, Project, Task, Comment],
+    synchronize: true,
+  }),
+}),
+
     UsersModule,
     ProjectsModule,
     TasksModule,
