@@ -25,15 +25,15 @@ import { Tenant } from './tenant/tenant.entity';
 
         // If DATABASE_URL exists → use PostgreSQL (Render environment)
         if (dbType === 'postgres' || config.get<string>('DATABASE_URL')) {
-          return {
-            type: 'postgres',
-            url: config.get<string>('DATABASE_URL'),
-            entities: [User, Project, Task, Comment, Tenant],
-            synchronize: true, // Automatically sync entities (disable in production for safety)
-          };
+            return {
+              type: 'postgres',
+              url: config.get<string>('DATABASE_URL'),
+              ssl: { rejectUnauthorized: false }, // important pour Render
+              entities: [User, Project, Task, Comment, Tenant],
+              synchronize: true,
+            };
         }
-
-        // Otherwise → use MySQL (local development environment)
+     // Otherwise → use MySQL (local development environment)
         return {
           type: 'mysql',
           host: config.get<string>('DB_HOST'),
