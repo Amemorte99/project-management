@@ -25,4 +25,6 @@ export class UsersController {
   create(@Body() data: Partial<User>): Promise<User> {
     return this.service.create(data);
   }
+
+  
 }

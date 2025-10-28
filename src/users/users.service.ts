@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -26,14 +26,15 @@ async findByUsername(username: string): Promise<User | undefined> {
 }
 
 
-  async create(userData: Partial<User>): Promise<User> {
-    // Hash du mot de passe
-    if (userData.password) {
-      userData.password = await bcrypt.hash(userData.password, 10);
+    async create(userData: Partial<User>): Promise<User> {
+    if (!userData.username || !userData.password) {
+        throw new BadRequestException('Username and password are required');
     }
+    userData.password = await bcrypt.hash(userData.password, 10);
     const user = this.repo.create(userData);
     return this.repo.save(user);
-  }
+    }
+
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.findByUsername(username);
