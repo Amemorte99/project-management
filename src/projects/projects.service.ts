@@ -31,7 +31,6 @@ export class ProjectsService {
   return this.repo.save(project); // ✅ Gère owner, tenantId, etc.
 }
 
-
   async delete(id: number): Promise<void> {
     const result = await this.repo.delete(id);
     if (result.affected === 0) throw new NotFoundException(`Project ${id} not found`);

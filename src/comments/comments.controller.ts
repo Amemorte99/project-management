@@ -9,43 +9,43 @@ export class CommentsController {
   constructor(private readonly service: CommentsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les commentaires' })
+  @ApiOperation({ summary: 'Retrieve all comments' })
   findAll() {
     return this.service.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un commentaire par ID' })
+  @ApiOperation({ summary: 'Retrieve a comment by ID' })
   findOne(@Param('id') id: number) {
     return this.service.findOne(id);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Créer un commentaire' })
+  @ApiOperation({ summary: 'Create a comment' })
   create(@Body() data: Partial<Comment>) {
     return this.service.create(data);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour un commentaire' })
+  @ApiOperation({ summary: 'Update a comment' })
   update(@Param('id') id: number, @Body() data: Partial<Comment>) {
     return this.service.update(id, data);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer un commentaire' })
+  @ApiOperation({ summary: 'Delete a comment' })
   remove(@Param('id') id: number) {
     return this.service.delete(id);
   }
 
   @Get('task/:taskId')
-  @ApiOperation({ summary: 'Récupérer les commentaires d’une tâche' })
+  @ApiOperation({ summary: 'Retrieve comments for a specific task' })
   findByTask(@Param('taskId') taskId: number) {
     return this.service.findByTask(taskId);
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les commentaires d’un utilisateur' })
+  @ApiOperation({ summary: 'Retrieve comments by a specific user' })
   findByUser(@Param('userId') userId: number) {
     return this.service.findByUser(userId);
   }

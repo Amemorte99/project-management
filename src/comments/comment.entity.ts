@@ -8,6 +8,7 @@ export class Comment {
   id: number;
 
 
+
   @Column({ type: 'text' })
   content: string;
 

@@ -29,20 +29,20 @@ export class Task {
   @Column({ default: 0 })
   priority: number;
 
-  @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, project => project.tasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => User, (user) => user.assignedTasks, { nullable: true })
+  @ManyToOne(() => User, user => user.assignedTasks, { nullable: true })
   @JoinColumn({ name: 'assignedToId' })
   assignedTo?: User;
 
-  @ManyToOne(() => User, (user) => user.createdTasks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.createdTasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'createdById' })
   createdBy: User;
 
-  @OneToMany(() => Comment, (comment) => comment.task)
-  comments: Comment[]; 
+  @OneToMany(() => Comment, comment => comment.task)
+  comments: Comment[];
 
   @CreateDateColumn()
   createdAt: Date;

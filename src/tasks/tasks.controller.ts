@@ -8,32 +8,37 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 export class TasksController {
   constructor(private readonly service: TasksService) {}
 
+  // Get all tasks
   @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les tâches' })
+  @ApiOperation({ summary: 'Retrieve all tasks' })
   findAll() {
     return this.service.findAll();
   }
 
+  // Get a task by its ID
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer une tâche par ID' })
+  @ApiOperation({ summary: 'Retrieve a task by ID' })
   findOne(@Param('id') id: number) {
     return this.service.findOne(id);
   }
 
+  // Create a new task
   @Post()
-  @ApiOperation({ summary: 'Créer une tâche' })
+  @ApiOperation({ summary: 'Create a new task' })
   create(@Body() data: Partial<Task>) {
-    return this.service.create(data);
+    return this.service.create(data, data.project?.tenant?.id);
   }
 
+  // Update an existing task
   @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour une tâche' })
+  @ApiOperation({ summary: 'Update a task' })
   update(@Param('id') id: number, @Body() data: Partial<Task>) {
     return this.service.update(id, data);
   }
 
+  // Delete a task
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une tâche' })
+  @ApiOperation({ summary: 'Delete a task' })
   remove(@Param('id') id: number) {
     return this.service.delete(id);
   }
