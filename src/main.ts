@@ -1,10 +1,18 @@
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // --- Enable CORS ---
+  app.enableCors({
+    origin: [
+      'http://localhost:5173', // frontend en développement (Vite)
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true, // autoriser les cookies si nécessaire
+  });
 
   // --- Swagger setup ---
   const config = new DocumentBuilder()
@@ -20,6 +28,5 @@ async function bootstrap() {
   console.log(`Application running on: http://localhost:3000`);
   console.log(`Swagger UI available on: http://localhost:3000/api`);
 }
-
 
 bootstrap();
