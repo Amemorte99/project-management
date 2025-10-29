@@ -14,6 +14,7 @@ import { Task } from './tasks/task.entity';
 import { Comment } from './comments/comment.entity';
 import { Tenant } from './tenant/tenant.entity';
 import { TenantsModule } from './tenant/tenant.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { TenantsModule } from './tenant/tenant.module';
       },
     }),
 
-    // Modules applicatifs
+    AuthModule,
     UsersModule,
     ProjectsModule,
     TasksModule,
