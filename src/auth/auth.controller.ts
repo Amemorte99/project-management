@@ -1,6 +1,9 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
+
+
 
 @ApiTags('auth')
 @Controller('auth')
@@ -9,11 +12,8 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'User login' })
-  async login(@Body() body: { username: string; password: string }) {
-    const user = await this.authService.validateUser(body.username, body.password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
-    }
-    return this.authService.login(user);
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 }
+
