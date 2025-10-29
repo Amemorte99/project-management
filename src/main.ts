@@ -6,25 +6,25 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   /**
-   * Enable Cross-Origin Resource Sharing (CORS)
-   * Allows requests from your frontend app (local or production)
+   * Enable CORS (Cross-Origin Resource Sharing)
+   * Allows frontend applications to access this API from different origins
    */
   app.enableCors({
     origin: [
-      'http://localhost:5173', // Frontend in development (Vite)
-      'https://testtechniquefront.netlify.app', // Frontend in production (Netlify)
+      'http://localhost:5173', // Development frontend (Vite)
+      'https://testtechniquefront.netlify.app', // Production frontend (Netlify)
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true, // Allow cookies or authorization headers
+    credentials: true, // Allow cookies and Authorization headers
   });
 
   /**
-   *  Swagger API Documentation setup
-   * Provides an interactive UI to test and explore API endpoints
+   * Swagger API documentation setup
+   * Provides an interactive interface for testing and exploring API endpoints
    */
   const config = new DocumentBuilder()
     .setTitle('Project Management API')
-    .setDescription('API for managing projects, tasks, and comments.')
+    .setDescription('API for managing projects, tasks, tenants, and comments.')
     .setVersion('1.0')
     .build();
 
@@ -32,11 +32,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   /**
-   *  Start the server
+   * Start the NestJS server
    */
   await app.listen(3000);
-  console.log(` Application running at: http://localhost:3000`);
-  console.log(` Swagger UI available at: http://localhost:3000/api`);
+  console.log(`Server is running at: http://localhost:3000`);
+  console.log(`Swagger UI available at: http://localhost:3000/api`);
 }
 
 bootstrap();
