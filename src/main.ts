@@ -5,28 +5,38 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // --- Enable CORS ---
+  /**
+   * Enable Cross-Origin Resource Sharing (CORS)
+   * Allows requests from your frontend app (local or production)
+   */
   app.enableCors({
     origin: [
-      'http://localhost:5173', // frontend en développement (Vite)
+      'http://localhost:5173', // Frontend in development (Vite)
+      'https://testtechniquefront.netlify.app', // Frontend in production (Netlify)
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true, // autoriser les cookies si nécessaire
+    credentials: true, // Allow cookies or authorization headers
   });
 
-  // --- Swagger setup ---
+  /**
+   *  Swagger API Documentation setup
+   * Provides an interactive UI to test and explore API endpoints
+   */
   const config = new DocumentBuilder()
     .setTitle('Project Management API')
-    .setDescription('API pour gérer les projets, tâches et commentaires')
+    .setDescription('API for managing projects, tasks, and comments.')
     .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  /**
+   *  Start the server
+   */
   await app.listen(3000);
-  console.log(`Application running on: http://localhost:3000`);
-  console.log(`Swagger UI available on: http://localhost:3000/api`);
+  console.log(` Application running at: http://localhost:3000`);
+  console.log(` Swagger UI available at: http://localhost:3000/api`);
 }
 
 bootstrap();
